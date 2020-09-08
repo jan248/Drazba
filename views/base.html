@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <link rel="stylesheet" type="text/css"  href="{{ROOT}}static/main.css">
+    <meta charset='utf8'>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <header id='header'>
+      <a class="logo" href='{{ROOT}}zacetna_stran/'>Domov</a>
+      <nav>
+        <a href="{{ROOT}}oglasi/">Oglasi</a>
+        %if stanje == 0:
+        <a href="{{ROOT}}prijava/">Prijava</a>
+        <a href="{{ROOT}}registracija/">Registracija</a>
+        %end 
+        %if stanje != 0:
+        <a href="{{ROOT}}uporabnik/{{stanje}}/">Moj profil</a>
+        <a href="{{ROOT}}odjava/">Odjava</a>
+        %end
+      </nav>
+      </header>
+    </div>
+    </head>
+<body>
+{{!base}}
+</body>
+
+
+

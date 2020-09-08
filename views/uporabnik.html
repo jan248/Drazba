@@ -1,0 +1,78 @@
+%rebase('base.html', stanje=stanje, ROOT=ROOT)
+
+<h1>Pozdravljeni {{ime}} {{priimek}}.</h1>
+<div class="highlights">
+  <div class="content">
+  <header>
+      <h3>
+        <b>
+          <a href="{{ROOT}}uporabnik/{{stanje}}/denar/" > S klikom naložite ali dvignite denar</a>
+        </b>
+      </h3>
+  </header>
+  </div>
+  <div class="content">
+  <header>
+  <h3> 
+    <b>
+      <a href="{{ROOT}}uporabnik/{{stanje}}/trgovanje/">Trgujte z delnicami</a> 
+    </b>
+  </h3>
+  </header>
+  </div>
+  
+</div>
+  %if stanje == 69:
+  <div align="center">
+  <form action="/posodobi/" class="form-signin text-center" method='post' style="width: 30%;margin-top: 0cm">
+  <div class="h3 mb-3 font-weight-normal">
+  <input value='Posodobi' type='submit' />
+  </div>
+  </form>
+  </div>
+  %end
+
+%if trans == []:
+  
+  <h5> Naložite denar in začnite trgovati </h5>
+%end
+%if trans != []:
+<h2> Vaše stanje na računu je {{vrednost}} EUR</h2>
+<div align="left">
+<h4> Vaše transakcije na računu </h4>
+<table>
+<tr>
+  <th> ID </th>
+  <th> Znesek </th>
+%for id,znesek,uporabnik in trans:
+<tr>
+<th>{{id}}</th>
+<th>{{znesek}} EUR</th>
+</tr>
+%end
+%end
+</table>
+</div>
+%if trans_delnice == []:
+  <h5> Začnite trgovati z delnicami! </h5>
+%end
+%if trans_delnice != []:
+<div align="left">
+<h4> Vaše operacije z delnicami </h4>
+<table>
+<tr>
+  <th> Oznaka delnice </th>
+  <th> Kolicina </th>
+
+</tr>
+
+%for id,uporabnik,oznaka,kolicina in trans_delnice:
+<tr>
+  <th><a href="{{ROOT}}uporabnik/{{stanje}}/trgovanje/{{oznaka}}/"> {{oznaka}} </a></th>
+  <th> {{kolicina}} </th>
+</tr>
+%end
+%end
+</table>
+</div>
+

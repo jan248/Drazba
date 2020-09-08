@@ -1,0 +1,34 @@
+%rebase('base.html', stanje=stanje, ROOT=ROOT)
+ 
+<div align="center">
+<h1> Še danes začnite s trgovanjem in začnite živeti življenje, kot si ga zaslužite.</h1>
+<form action='{{ROOT}}registracija/' class="form-signin text-center" method='post' style="width: 30%;margin-top: 5cm">
+    <div class="h3 mb-3 font-weight-normal">
+    <span>Ime:</span><input name='ime' type='text' value='{{ime}}'/>
+    <br>
+    <span>Priimek:</span><input name='priimek' type='text' value='{{priimek}}'/>
+    <br>
+    <span>Uporabniško ime</span><input name='uid' type='text' value='{{uid}}'/>
+    <br>
+    %if napaka == 2:
+    <h2> Uporabnik s tem uporabniškim imenom je že registriran. </h2>
+    %end
+    <br>
+    <span>Geslo:</span><input name='pass1' type='password' />
+    <br>
+    <span>Ponovite geslo:</span><input name='pass2' type='password' />
+    <br>
+    %if napaka == 4:
+    <h2> Gesli se ne ujemata. </h2>      
+    %end
+    %if napaka == 5:
+    <h2> Geslo je prekratko.
+    %end
+    %if napaka == 1:
+    <h2> Izpolnite vsa polja.</h2>
+    %end
+    <br>
+    <input value='Registracija' type='submit' />
+    </div> 
+</form>
+</div>
