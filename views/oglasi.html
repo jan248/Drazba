@@ -1,0 +1,19 @@
+% rebase('base.html', stanje=stanje, ROOT=ROOT)
+
+
+
+<h1> Na voljo so naslednji oglasi:</h1>
+<table>
+    <tr>
+        <th>Ime</th>
+        <th>ID prodajalca</th>
+        <th>Zacetna cena</th>
+    </tr>
+%for id, ime, id_prodajalca, zacetna_cena in oglasi:
+<tr>
+    <th><a href="{{ROOT}}oglas/{{id}}">{{ime}}</th>
+    <th>{{id_prodajalca}}</th>
+    <th>{{zacetna_cena}} €</th>
+</tr>
+%end
+</table>

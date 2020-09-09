@@ -1,7 +1,7 @@
 from bottle import *
 import os
 import json
-import datetime
+import datetime as dt
 
 
 
@@ -40,7 +40,14 @@ TEMPLATE_PATH.insert(0, abs_views_path )
 static_dir = "./static"
 
 
+def odpri_json(pot):
+    with open(pot, 'r') as f:
+        return json.load(f)
 
+def zapisi_json(pot, podatki):
+    with open(pot, 'w') as f:
+        json.dump(podatki, f)
+    
 
 
 @route("/static/<filename:path>")
@@ -61,19 +68,17 @@ def zacetna():
 
 
 def preveri_uporabnika(ime, geslo):
-    with open('podatki/uporabniki.json', 'r') as f:
-        igralci = json.load(f)
-        for igralec in igralci:
-            if igralec['uid'] == ime and igralec['geslo'] == geslo:
-                return True
-        return False
+    uporabniki = odpri_json('podatki/uporabniki.json')
+    for uporabnik in uporabniki:
+        if uporabnik['uid'] == ime and uporabnik['geslo'] == geslo:
+            return True
+    return False
 
 def pridobi_podatke(uid):
-    with open('podatki/uporabniki.json', 'r') as f:
-        igralci = json.load(f)
-        for igralec in igralci:
-            if igralec['uid'] == uid:
-                return igralec
+    uporabniki = odpri_json('podatki/uporabniki.json')
+    for uporabnik in uporabniki:
+        if uporabnik['uid'] == uid:
+            return uporabnik
 
 @get('/prijava/')
 def prijava():
@@ -85,8 +90,8 @@ def prijavljanje():
     uid = request.forms.uid
     geslo = request.forms.geslo
     if preveri_uporabnika(uid, geslo):
-        igralec = pridobi_podatke(uid)
-        stevilka = igralec['id']
+        uporabnik = pridobi_podatke(uid)
+        stevilka = uporabnik['id']
         response.set_cookie("id",stevilka, path='/', secret = kodiranje)
         redirect('{0}uporabnik/{1}/'.format(ROOT, stevilka))
     else:
@@ -95,11 +100,10 @@ def prijavljanje():
 
 def podatki(no):
     no = int(no)
-    with open('podatki/uporabniki.json', 'r') as f:
-        data = json.load(f)
-    for igralec in data:
-        if igralec['id'] == no:
-            return igralec
+    uporabniki = odpri_json('podatki/uporabniki.json')
+    for uporabnik in uporabniki:
+        if uporabnik['id'] == no:
+            return uporabnik
 
 @get('/uporabnik/<oznaka>/')
 def uporabnik(oznaka):
@@ -121,8 +125,7 @@ def registracija():
 
 
 def vstavi_novega(ime, priimek, uid, geslo):
-    with open('podatki/uporabniki.json', 'r') as f:
-        data = json.load(f)
+    data = odpri_json('podatki/uporabniki.json')
     seznam = []
     for i in data:
         seznam.append(i['id'])
@@ -131,8 +134,7 @@ def vstavi_novega(ime, priimek, uid, geslo):
     except: naslednja_stevilka = 1
 
     data.append({'id':naslednja_stevilka, 'ime':ime, 'priimek': priimek, 'uid': uid, 'geslo':geslo})
-    with open('podatki/uporabniki.json', 'w') as f:
-        json.dump(data, f)
+    zapisi_json('podatki/uporabniki.json', data)
     return naslednja_stevilka
 
 
@@ -152,11 +154,10 @@ def registriranje():
     if ime == '' or priimek == '' or uid == '' or geslo1 == '' or geslo2 == '':
         return rtemplate('registracija.html', napaka = 1, stanje = stanje **podatki)
 
-    with open ('podatki/uporabniki.json', 'r') as f:
-        data = json.load(f)
-        for i in data:
-            if i['uid'] == uid:
-                return rtemplate('registracija.html', napaka = 2,stanje = stanje, **podatki)
+    data = odpri_json('podatki/uporabniki.json')
+    for i in data:
+        if i['uid'] == uid:
+            return rtemplate('registracija.html', napaka = 2,stanje = stanje, **podatki)
 
 
     if len(geslo1) < 6:
@@ -180,6 +181,93 @@ def iskanje(poizvedba, polje):
     if polje.find(poizvedba) != -1:
         return True
     return False
+
+
+
+
+@get('/oglasi/')
+def oglasi():
+    stanje = id_uporabnik()
+    data = odpri_json('podatki/oglasi.json')
+    oglasi = []
+    for i in data:
+        helper = []
+        for key in i:
+            helper.append(i[key])
+        oglasi.append(helper)
+    return rtemplate('oglasi.html', stanje = stanje, oglasi = oglasi)
+
+@get('/oglas/<oznaka>')
+def oglas(oznaka):
+    stanje = id_uporabnik()
+    data = odpri_json('podatki/oglasi.json')
+    for i in data:
+        if i['id'] == int(oznaka):
+            podatki = i    
+    cas_do_konca = str(dt.datetime.strptime(i['zakljucek'], '%d.%m.%Y %H:%M') - dt.datetime.now())
+    i = cas_do_konca.find('days')
+    pretvorba = cas_do_konca[:i] + 'dni' + cas_do_konca[i+4:]
+    cas_do_konca = ':'.join(str(pretvorba).split(':')[:2])
+    return rtemplate('oglas.html', stanje = stanje, konec = cas_do_konca, **podatki)
+
+
+
+
+
+@get('/uporabnik/oglasi')
+def oglasi_uporabnika():
+    stanje = id_uporabnik()
+    data = odpri_json('podatki/oglasi.json')
+    oglasi = []
+    for i in data:
+        if int(i['prodajalec_id']) == stanje:
+            pomozni = []
+            for key in i:
+                pomozni.append(i[key])
+            oglasi.append(pomozni)
+    return rtemplate('oglasi_uporabnik.hmtl', oglasi = oglasi, stanje = stanje)
+
+@post('/uporabnik/oglasi/<oznaka>')
+def odstrani(oznaka):
+    stanje = id_uporabnik()
+    data = odpri_json('podatki/oglasi.json')
+    oglasi = []
+    for i in data:
+        if int(i['id']) != int(oznaka):
+            oglasi.append(i)
+    zapisi_json('podatki/oglasi.json', oglasi)
+    redirect('{0}uporabnik/oglasi'.format(ROOT))
+
+
+@post('/oglas/<oznaka>')
+def stavi(oznaka):
+    stanje = id_uporabnik()
+    try:
+        cena = int(request.forms.cena)
+    except:
+        'napaka 1'
+    data = odpri_json('podatki/oglasi.json')
+    for i in data:
+        if int(i['id']) == int(oznaka):
+            oglas = i
+    if cena < i['zacetna_cena']:
+        'napaka 2'
+    stava = {'id_ponudbe':oglas['id'], 'id_ponudnika': stanje, 'cena':cena}
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 run(host='localhost', port=SERVER_PORT, reloader=RELOADER)
