@@ -1,1 +1,1 @@
-[{"id":1, "ime":"Jan", "priimek":"Skoberne", "uid":"hero1", "pass":"sentjur"}]
+[{"id": 1, "ime": "Jan", "priimek": "Skoberne", "uid": "hero1", "geslo": "sentjur"}, {"id": 2, "ime": "Bojko", "priimek": "Bojko", "uid": "bojko", "geslo": "123456"}, {"id": 3, "ime": "Sabrina", "priimek": "Sabrina", "uid": "Sabrina", "geslo": "123456789"}]

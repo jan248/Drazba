@@ -1,15 +1,48 @@
 %rebase('base.html', stanje=stanje, ROOT=ROOT)
 
 
+<center><h1><b>Sodeluj v dražbi</b></h1></center>
+<br>
+
+<center><img src="{{ROOT}}static/images/drazba.jpg" class="photo" width="600" height="392"></center>
 
 
-<section id="banner">
-<div class="inner">
-    <h1>Zelo dobra borza</h1>
-    <p>Naša borza je zelo dobra in vsi ki tu trgujejo, zaslužijo veliko denarja. <br /> 
-      Če pa se najde kdo, ki je izgubil vse, je pa to njegova osebna krivda.</p>
-    <a href='{{ROOT}}registracija/'><button>Odpri račun</button></a>
-</div>
+%if stanje == 0:
+<center><div style='position: center;margin: auto;max-width: 55%;'>
+  <div class="row">
+    <div class="item1">
+      <h2>Registriraj se</h2>
+      <p>Pridruži se našim uporabnikom in sodeluj v dražbah.</p>
+      <a href="{{ROOT}}registracija/" class="button">Registriraj se</a>
+    </div>
+    <div class="item2">
+      <h2>Oglej si dražbe</h2>
+      <p>Oglej si dražbe, ki že potekajo</p>
+      <a href="{{ROOT}}oglasi/" class="button">Seznam oglasov</a>
+    </div>
+  </div>
+  </div></center>
+  %end
 
-</section>
+%if stanje != 0:
+<center><div style='position: center;margin: auto;max-width: 55%;'>
+  <div class="row">
+    <div class="item1">
+      <h2>Tvoj profil</h2>
+      <p>Oglej si svoj profil in dražbe v katerih sodeluješ.</p>
+      <a href="{{ROOT}}uporabnik/{{stanje}}/" class="button">Tvoj profil</a>
+    </div>
+    <div class="item2">
+      <h2>Oglej si dražbe</h2>
+      <p>Oglej si dražbe, ki že potekajo</p>
+      <a href="{{ROOT}}oglasi/" class="button">Seznam oglasov</a>
+    </div>
+  </div>
+  </div></center>
+  %end
+
+
+
+
+
 

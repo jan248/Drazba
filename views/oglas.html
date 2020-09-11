@@ -1,21 +1,38 @@
 % rebase('base.html', stanje=stanje, ROOT=ROOT)
 
-
-
-<h1>{{ime}}</h1>
+<center><h1><b>{{ime}}</b></h1>
 
 <h2>Opis:</h2>
 <h3>{{opis}}</h3>
 <h3>Drazba se konca v {{konec}}</h3>
+</center>
 
-%if stanje != 0:
 <div align="center">
-<form action='{{ROOT}}oglas/{{id}}' class="form-signin text-center" method='post' style="width: 30%;margin-top: 5cm">
-<span>Koliko vi ponudite:</span><input name='geslo' type='integer' />
-    <br>
-    <input value='Oddaj' type='submit' />
+<form action='{{ROOT}}oglas/{{id}}' class="form-signin text-center" method='post' style="width: 30%;margin-top: 3cm">
+<spam><h3><b>Cena, ki ste jo pripravljeni plačati:</b></h3></spam>
+<p>Če želiš sodelovati moraš ponuditi več kot {{zacetna_cena}} €.</p>
+<input name='cena' type='integer' />
 
+<br>
+<br>
 
+<input value='Oddaj' type='submit' />
 </form>
 </div>
+
+%if ostali != []:
+<h3>Do sedaj so že stavili:</h3>
+<table>
+    <tr>
+        <td>Id_uprabnika</td>
+        <td>Cena</td>
+    </tr>
+%for id, cena in ostali:
+    <tr>
+        <td>{{id}}</td>
+        <td>{{cena}} €</td>
+    </tr>
+
+%end
+</table>
 %end
