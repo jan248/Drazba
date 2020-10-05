@@ -2,18 +2,24 @@
 
 
 
-<h1> Na voljo so naslednji oglasi:</h1>
+<h1> Vaši oglasi so:</h1>
 <table>
     <tr>
         <th>Ime</th>
-        <th>ID prodajalca</th>
+        <th>Opis</th>
         <th>Zacetna cena</th>
+        <th>Konec</th>
+        <th>Odstrani</th>
     </tr>
-%for id, ime, id_prodajalca, zacetna_cena in oglasi:
+%for id, ime, opis, konec, cena in oglasi:
 <tr>
-    <th><a href="{{ROOT}}oglas/{{id}}">{{ime}}</th>
-    <th>{{id_prodajalca}}</th>
-    <th>{{zacetna_cena}} €</th>
+    <td><a href="{{ROOT}}oglas/{{id}}">{{ime}}</td>
+    <td>{{opis}}</td>
+    <td>{{cena}} €</td>
+    <td>{{konec}}</td>
+    <form action='{{ROOT}}uporabnik/oglasi/{{id}}' class="form-signin text-center" method='post' style="width: 30%;margin-top: 5cm">
+    <th><input value='Odstrani' type='submit' /></th>
+    </form>    
 </tr>
 %end
 </table>

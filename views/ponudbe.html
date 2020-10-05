@@ -1,3 +1,15 @@
 %rebase('base.html', stanje=stanje, ROOT=ROOT)
 
-ponudbe
+<h1>Naredili ste naslednje ponudbe:</h1>
+
+<table>
+    <tr>
+        <td>ID ponudbe</td>
+        <td>Cena</td>
+    </tr>
+%for id, cena in ponudbe:
+    <tr>
+        <td><a href="{{ROOT}}oglas/{{id}}">{{id}}</td>
+        <td>{{cena}} €</td>
+    </tr>
+%end

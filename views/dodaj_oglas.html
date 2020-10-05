@@ -1,0 +1,31 @@
+% rebase('base.html', stanje=stanje, ROOT=ROOT)
+
+
+<h3>Izpolnite spodnji obrazec in vaša ponudba bo takoj postala vidna na spletni strani.</h3>
+<h4>Obrazec izpolnite v obliki: "Dan.Mesec.Leto Ura:Minute". Na primer 23.06.2021 12:30. Cena naj bo zaokrožena na 1€ in jo navedite brez znaka "€". Na primer, če želite da je začetna cena 10€, enostavno vnesite 10.</h4>
+%if napaka == 1:
+<h5>Napačna oblika cene.</h5>
+%end
+
+%if napaka == 2:
+<h5>Napačna oblika datuma.</h5>
+%end
+
+%if napaka == 3:
+<h5>Prosim izpolnite vsa polja.</h5>
+%end
+
+
+<div align="center">
+<form action="{{ROOT}}uporabnik/dodaj"class="form-signin text-center" method='post' style="width: 30%;margin-top: 5cm">
+    <div class="h3 mb-3 font-weight-normal">
+    <span>Ime:</span><input name='ime' type='text' />
+    <br>
+    <span>Opis:</span><input name='opis' type='text' />
+    <br>
+    <span>Začetna cena:</span><input name='cena' type='text' placeholder="0"  />
+    <br>
+    <span>Zaključek:</span><input name='zakljucek' type="text" />
+    <br>
+    <input value='Dodaj' type='submit' />
+    </div>

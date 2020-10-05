@@ -28,7 +28,7 @@ kodiranje = 'skrivnost'
 def id_uporabnik():
     if request.get_cookie("id", secret = kodiranje):
         piskotek = request.get_cookie("id", secret = kodiranje)
-        return piskotek
+        return int(piskotek)
     else:
         return 0
 
@@ -74,12 +74,11 @@ def najdi_zmagovalca(id):
 
 def preglej_stare():
     podatki = odpri_json('podatki/oglasi.json')
-    now = dt.datetime.now().timestamp()
     seznam = []
     for i in podatki:
-        if dt.datetime.strptime(i['zakljucek'], '%d.%m.%Y %H:%M').timestamp() - now < 0:
+        if dt.datetime.strptime(i['zakljucek'], '%d.%m.%Y %H:%M') < dt.datetime.now():
             zmagovalec, cena = najdi_zmagovalca(i["id_ponudbe"])
-            podatek = {"id_ponudbe": i["id_ponudbe"], "id_zmagovalca": zmagovalec, "cena": cena}
+            podatek = {"id_ponudbe": i["id_ponudbe"], "id_zmagovalca": zmagovalec, "cena": cena, "id_ponudnika":i['prodajalec_id']}
             dodaj_in_zapisi('podatki/stari_oglasi.json', podatek)
         else:
             seznam.append(i)
@@ -130,8 +129,7 @@ def prijava():
 def prijavljanje():
     uid = request.forms.uid
     geslo = request.forms.geslo
-    print(uid)
-    print(geslo)
+
     if preveri_uporabnika(uid, geslo):
         uporabnik = pridobi_podatke(uid)
         stevilka = uporabnik['id']
@@ -165,7 +163,6 @@ def registracija():
     stanje = id_uporabnik()
     polja_registracija = ("ime", "priimek", "uid", "pass1", "pass2")
     podatki = {polje: "" for polje in polja_registracija} 
-    napaka = 0
     return rtemplate('registracija.html', napaka = 0,stanje = stanje, **podatki)
 
 
@@ -218,15 +215,10 @@ def registriranje():
 @get('/odjava/')
 def odjava():
     preglej_stare()
+
     response.delete_cookie("id", path='/')
+    
     redirect('{0}zacetna_stran/'.format(ROOT))
-
-
-
-def iskanje(poizvedba, polje):
-    if polje.find(poizvedba) != -1:
-        return True
-    return False
 
 
 
@@ -237,16 +229,11 @@ def oglasi():
     preglej_stare()
     data = odpri_json('podatki/oglasi.json')
     oglasi = []
-    now = dt.datetime.now()
     for i in data:
-        if dt.datetime.strptime(i['zakljucek'], '%d.%m.%Y %H:%M').timestamp() - now.timestamp() < 0:
-            print(dt.datetime.strptime(i['zakljucek'], '%d.%m.%Y %H:%M').timestamp() - now.timestamp())
-            pass
-        else:
-            helper = []
-            for key in i:
-                helper.append(i[key])
-            oglasi.append(helper)
+        helper = []
+        for key in i:
+            helper.append(i[key])
+        oglasi.append(helper)
     return rtemplate('oglasi.html', stanje = stanje, oglasi = oglasi)
 
 @get('/oglas/<oznaka>')
@@ -257,6 +244,7 @@ def oglas(oznaka):
     for i in data:
         if int(i['id']) == int(oznaka):
             podatki = i    
+
     cas_do_konca = str(dt.datetime.strptime(i['zakljucek'], '%d.%m.%Y %H:%M') - dt.datetime.now())
     i = cas_do_konca.find('days')
     pretvorba = cas_do_konca[:i] + 'dni' + cas_do_konca[i+4:]
@@ -283,10 +271,13 @@ def oglasi_uporabnika():
     data = odpri_json('podatki/oglasi.json')
     oglasi = []
     for i in data:
-        if int(i['prodajalec_id']) == stanje:
+        if i["prodajalec_id"] == stanje:
             pomozni = []
-            for key in i:
-                pomozni.append(i[key])
+            pomozni.append(i['id'])
+            pomozni.append(i['ime'])
+            pomozni.append(i['opis'])
+            pomozni.append(i['zakljucek'])
+            pomozni.append(i['zacetna_cena'])
             oglasi.append(pomozni)
     return rtemplate('oglasi_uporabnik.html', oglasi = oglasi, stanje = stanje)
 
@@ -305,10 +296,12 @@ def odstrani(oznaka):
 @post('/oglas/<oznaka>')
 def stavi(oznaka):
     stanje = id_uporabnik()
+
     data = odpri_json('podatki/oglasi.json')
     for i in data:
         if i['id'] == int(oznaka):
             podatki = i    
+
     cas_do_konca = str(dt.datetime.strptime(i['zakljucek'], '%d.%m.%Y %H:%M') - dt.datetime.now())
     j = cas_do_konca.find('days')
     pretvorba = cas_do_konca[:j] + 'dni' + cas_do_konca[j+4:]
@@ -322,6 +315,9 @@ def stavi(oznaka):
             helper.append(i['id_ponudnika'])
             helper.append(i['cena'])
             seznam.append(helper)
+    if int(stanje) == int(podatki['prodajalec_id']):
+        return rtemplate('oglas.html', stanje = stanje, konec = cas_do_konca, napaka = 3, ostali = seznam, **podatki)
+
     try:
         cena = int(request.forms.cena)
     except:
@@ -342,6 +338,7 @@ def stavi(oznaka):
 @get('/uporabnik/ponudbe')
 def ponudbe():
     stanje = id_uporabnik()
+    preglej_stare()
     podatki = odpri_json('podatki/stave.json')
     seznam = []
     for i in podatki:
@@ -354,6 +351,73 @@ def ponudbe():
 
 
 
+@get('/uporabnik/koncane')
+def koncane():
+    preglej_stare()
+    stanje = id_uporabnik()
+    podatki = odpri_json('podatki/stari_oglasi.json')
+    seznam_tvojih = []
+    seznam_zmag = []
+    for i in podatki:
+        if int(i['id_ponudnika']) == int(stanje):
+            helper = []
+            for key in i:
+                helper.append(i[key])
+            seznam_tvojih.append(helper)
+        elif int(i['id_zmagovalca']) == int(stanje):
+            helper = []
+            for key in i:
+                helper.append(i[key])
+            seznam_zmag.append(helper)
+    return rtemplate('koncane.html', moje = seznam_tvojih, stanje = stanje, zmage = seznam_zmag)
+
+
+
+
+@get('/uporabnik/dodaj')
+def dodaj_oglas():
+    stanje = id_uporabnik()
+    preglej_stare()
+    return rtemplate('dodaj_oglas.html', stanje = stanje, napaka = 0)
+
+
+
+
+@post('/uporabnik/dodaj')
+def dodaj():
+    stanje = id_uporabnik()
+    ime = request.forms.ime
+    opis = request.forms.opis
+    cena = request.forms.cena 
+    zakljucek = request.forms.zakljucek
+    if ime == '' or opis == '' or cena == '' or zakljucek == '':
+        return rtemplate('dodaj_oglas.html', stanje = stanje, napaka = 3)
+
+    if not cena.isdigit():
+        return rtemplate('dodaj_oglas.html', stanje = stanje, napaka = 1)
+    cena = int(cena)
+
+    try:
+        end = dt.datetime.strptime(zakljucek, '%d.%m.%Y %H:%M')
+    except:
+        return rtemplate('dodaj_oglas.html', stanje = stanje, napaka = 2)
+
+    if end < datetime.now():
+        return rtemplate('dodaj_oglas.html', stanje = stanje, napaka = 2)
+
+    data = odpri_json('podatki/oglasi.json')
+    seznam = []
+    for i in data:
+        seznam.append(i['id'])
+    try: 
+        naslednja_stevilka = max(seznam) + 1
+    except: naslednja_stevilka = 1
+
+    nov_oglas = {"id":naslednja_stevilka, "ime":ime, "opis":opis, "prodajalec_id":stanje, "zakljucek":zakljucek, "zacetna_cena":cena}
+
+    dodaj_in_zapisi('podatki/oglasi.json', nov_oglas)
+
+    redirect('{0}uporabnik/{1}/'.format(ROOT, stanje))
 
 
 

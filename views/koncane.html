@@ -1,0 +1,33 @@
+% rebase('base.html', stanje=stanje, ROOT=ROOT)
+
+<h2>Vaši oglasi, ki so že pretekli in zmagovalci dražb:</h2>
+<table>
+    <tr>
+        <th>ID ponudbe</th>
+        <th>ID zmagovalca</th>
+        <th>Cena</th>
+    </tr>
+%for id_ponudbe, id_zmagovalca, cena, id_ponudnika in moje:
+    <tr>
+        <td>{{id_ponudbe}}</td>
+        <td>{{id_zmagovalca}}</td>
+        <td>{{cena}} €</td>
+    </tr>
+%end
+</table>
+
+<h2>Ponudbe, s katerimi ste zmagali na oglasu:</h2>
+<table>
+    <tr>
+        <th>ID ponudbe </th>
+        <th>ID ponudnika </th>
+        <th>Cena</th>
+    </tr>
+%for id_ponudbe, id_zmagovalca, cena, id_ponudnika in zmage:
+    <tr>
+        <td>{{id_ponudbe}}</td>
+        <td>{{id_zmagovalca}}</td>
+        <td>{{cena}} €</td>
+    </tr>
+%end
+</table>
