@@ -322,14 +322,11 @@ def stavi(oznaka):
         cena = int(request.forms.cena)
     except:
         return rtemplate('oglas.html', stanje = stanje, konec = cas_do_konca, napaka = 1, ostali = seznam, **podatki)
-    data = odpri_json('podatki/oglasi.json')
-    for i in data:
-        if int(i['id']) == int(oznaka):
-            oglas = i
-    if cena < i['zacetna_cena']:
+
+    if cena < int(podatki['zacetna_cena']):
         return rtemplate('oglas.html', stanje = stanje, konec = cas_do_konca, napaka = 2, ostali = seznam, **podatki)
 
-    stava = {'id_ponudbe':oglas['id'], 'id_ponudnika': stanje, 'cena':cena}
+    stava = {'id_ponudbe':podatki['id'], 'id_ponudnika': stanje, 'cena':cena}
     dodaj_in_zapisi('podatki/stave.json', stava)
     redirect('{0}oglas/{1}'.format(ROOT, oznaka))
 
