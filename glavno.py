@@ -39,7 +39,7 @@ TEMPLATE_PATH.insert(0, abs_views_path )
 # Mapa za statične vire (slike, css, ...)
 static_dir = "./static"
 
-
+# Pomožne funkcije za uporabo v kompleknejših daljših funkcijah
 def odpri_json(pot):
     with open(pot, 'r') as f:
         return json.load(f)
@@ -138,7 +138,7 @@ def prijavljanje():
     else:
         return rtemplate('prijava.html', stanje = 0, napaka = 1)
 
-
+# no je spremenljivka kot število
 def podatki(no):
     no = int(no)
     uporabniki = odpri_json('podatki/uporabniki.json')
