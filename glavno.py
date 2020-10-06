@@ -39,7 +39,7 @@ TEMPLATE_PATH.insert(0, abs_views_path )
 # Mapa za statične vire (slike, css, ...)
 static_dir = "./static"
 
-# Pomožne funkcije za uporabo v kompleknejših daljših funkcijah
+
 def odpri_json(pot):
     with open(pot, 'r') as f:
         return json.load(f)
@@ -134,11 +134,11 @@ def prijavljanje():
         uporabnik = pridobi_podatke(uid)
         stevilka = uporabnik['id']
         response.set_cookie("id",stevilka, path='/', secret = kodiranje)
-        redirect('{0}uporabnik/{1}/'.format(ROOT, stevilka))
+        redirect('{0}uporabnik/'.format(ROOT))
     else:
         return rtemplate('prijava.html', stanje = 0, napaka = 1)
 
-# no je spremenljivka kot število
+
 def podatki(no):
     no = int(no)
     uporabniki = odpri_json('podatki/uporabniki.json')
@@ -146,11 +146,11 @@ def podatki(no):
         if uporabnik['id'] == no:
             return uporabnik
 
-@get('/uporabnik/<oznaka>/')
-def uporabnik(oznaka):
+@get('/uporabnik/')
+def uporabnik():
     preglej_stare()
     stanje = id_uporabnik()
-    podatek = podatki(oznaka)
+    podatek = podatki(stanje)
     ime = podatek['ime']
     priimek = podatek['priimek']
     return rtemplate('uporabnik.html',stanje = stanje, ime = ime, priimek = priimek)
@@ -207,7 +207,7 @@ def registriranje():
     if geslo1 == geslo2:
         uid = vstavi_novega(ime, priimek, uid, geslo1)
         response.set_cookie("id",uid, path='/', secret = kodiranje)
-        string = '{0}uporabnik/{1}/'.format(ROOT,uid)
+        string = '{0}uporabnik/'.format(ROOT)
         redirect(string)
     else:
         return rtemplate('registracija.html', stanje = stanje, napaka = 4, **podatki)
@@ -322,11 +322,14 @@ def stavi(oznaka):
         cena = int(request.forms.cena)
     except:
         return rtemplate('oglas.html', stanje = stanje, konec = cas_do_konca, napaka = 1, ostali = seznam, **podatki)
-
-    if cena < int(podatki['zacetna_cena']):
+    data = odpri_json('podatki/oglasi.json')
+    for i in data:
+        if int(i['id']) == int(oznaka):
+            oglas = i
+    if cena < i['zacetna_cena']:
         return rtemplate('oglas.html', stanje = stanje, konec = cas_do_konca, napaka = 2, ostali = seznam, **podatki)
 
-    stava = {'id_ponudbe':podatki['id'], 'id_ponudnika': stanje, 'cena':cena}
+    stava = {'id_ponudbe':oglas['id'], 'id_ponudnika': stanje, 'cena':cena}
     dodaj_in_zapisi('podatki/stave.json', stava)
     redirect('{0}oglas/{1}'.format(ROOT, oznaka))
 
@@ -414,7 +417,7 @@ def dodaj():
 
     dodaj_in_zapisi('podatki/oglasi.json', nov_oglas)
 
-    redirect('{0}uporabnik/{1}/'.format(ROOT, stanje))
+    redirect('{0}uporabnik/'.format(ROOT))
 
 
 
