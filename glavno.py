@@ -146,11 +146,11 @@ def podatki(no):
         if uporabnik['id'] == no:
             return uporabnik
 
-@get('/uporabnik/<oznaka>/')
-def uporabnik(oznaka):
+@get('/uporabnik/')
+def uporabnik():
     preglej_stare()
     stanje = id_uporabnik()
-    podatek = podatki(oznaka)
+    podatek = podatki(stanje)
     ime = podatek['ime']
     priimek = podatek['priimek']
     return rtemplate('uporabnik.html',stanje = stanje, ime = ime, priimek = priimek)
