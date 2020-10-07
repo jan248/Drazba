@@ -134,7 +134,7 @@ def prijavljanje():
         uporabnik = pridobi_podatke(uid)
         stevilka = uporabnik['id']
         response.set_cookie("id",stevilka, path='/', secret = kodiranje)
-        redirect('{0}uporabnik/{1}/'.format(ROOT, stevilka))
+        redirect('{0}uporabnik/'.format(ROOT))
     else:
         return rtemplate('prijava.html', stanje = 0, napaka = 1)
 
@@ -207,7 +207,7 @@ def registriranje():
     if geslo1 == geslo2:
         uid = vstavi_novega(ime, priimek, uid, geslo1)
         response.set_cookie("id",uid, path='/', secret = kodiranje)
-        string = '{0}uporabnik/{1}/'.format(ROOT,uid)
+        string = '{0}uporabnik/'.format(ROOT)
         redirect(string)
     else:
         return rtemplate('registracija.html', stanje = stanje, napaka = 4, **podatki)
@@ -414,7 +414,7 @@ def dodaj():
 
     dodaj_in_zapisi('podatki/oglasi.json', nov_oglas)
 
-    redirect('{0}uporabnik/{1}/'.format(ROOT, stanje))
+    redirect('{0}uporabnik/'.format(ROOT))
 
 
 
