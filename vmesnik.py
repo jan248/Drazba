@@ -77,7 +77,7 @@ def prijavljanje():
 def uporabnik():
     preglej_stare()
     stanje = id_uporabnik()
-    podatek = podatki(stanje)
+    podatek = uporabnik_podatki(stanje)
     ime = podatek['ime']
     priimek = podatek['priimek']
     return rtemplate('uporabnik.html',stanje = stanje, ime = ime, priimek = priimek)
@@ -170,7 +170,7 @@ def oglas(oznaka):
     for i in podatk:
         if int(i['id_ponudbe']) == int(oznaka):
             helper = []
-            helper.append(i['id_ponudnika'])
+            helper.append(i['ime'])
             helper.append(i['cena'])
             seznam.append(helper)
     return rtemplate('oglas.html', stanje = stanje, konec = cas_do_konca, napaka = 0, ostali = seznam, **podatki)
@@ -208,10 +208,11 @@ def odstrani(oznaka):
     redirect('{0}uporabnik/oglasi'.format(ROOT))
 
 
+
 @post('/oglas/<oznaka>')
 def stavi(oznaka):
     stanje = id_uporabnik()
-
+    uporabnik = uporabnik_podatki(stanje)
     data = odpri_json('podatki/oglasi.json')
     for i in data:
         if i['id'] == int(oznaka):
@@ -241,7 +242,7 @@ def stavi(oznaka):
     if cena < int(podatki['zacetna_cena']):
         return rtemplate('oglas.html', stanje = stanje, konec = cas_do_konca, napaka = 2, ostali = seznam, **podatki)
 
-    stava = {'id_ponudbe':podatki['id'], 'id_ponudnika': stanje, 'cena':cena}
+    stava = {'id_ponudbe':podatki['id'], 'id_ponudnika': stanje, 'cena':cena, "ime": uporabnik['ime'] + ' ' + uporabnik["priimek"]}
     dodaj_in_zapisi('podatki/stave.json', stava)
     redirect('{0}oglas/{1}'.format(ROOT, oznaka))
 
@@ -330,17 +331,6 @@ def dodaj():
     dodaj_in_zapisi('podatki/oglasi.json', nov_oglas)
 
     redirect('{0}uporabnik/'.format(ROOT))
-
-
-
-
-
-
-
-
-
-
-
 
 
 run(host='localhost', port=SERVER_PORT, reloader=RELOADER)

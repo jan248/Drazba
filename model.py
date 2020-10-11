@@ -43,17 +43,18 @@ def najdi_zmagovalca(id):
     seznam = []
     for i in data:
         if int(i['id_ponudbe']) == int(id):
-            helper =  [i['cena'], i['id_ponudnika']]
+            helper =  [i['cena'], i['id_ponudnika'], i['ime']]
             seznam.append(helper)
     cene = []
     if seznam == []:
-        return 0,0
+        return 0,0,'Nihče'
     for i in seznam:
         cene.append(i[0])
     cena = max(cene)
     stevilo = cene.index(cena)
     zmagovalec = seznam[stevilo][1]
-    return zmagovalec, cena
+    ime = seznam[stevilo][2]
+    return zmagovalec, cena, ime
     
 
 def preglej_stare():
@@ -61,8 +62,8 @@ def preglej_stare():
     seznam = []
     for i in podatki:
         if dt.datetime.strptime(i['zakljucek'], '%d.%m.%Y %H:%M') < dt.datetime.now():
-            zmagovalec, cena = najdi_zmagovalca(i["id_ponudbe"])
-            podatek = {"id_ponudbe": i["id_ponudbe"], "id_zmagovalca": zmagovalec, "cena": cena, "id_ponudnika":i['prodajalec_id']}
+            zmagovalec, cena, ime = najdi_zmagovalca(i["id_ponudbe"])
+            podatek = {"id_ponudbe": i["id_ponudbe"], "id_zmagovalca": zmagovalec, "cena": cena, "id_ponudnika":i['prodajalec_id'], 'ime_zmagovalca':ime}
             dodaj_in_zapisi('podatki/stari_oglasi.json', podatek)
         else:
             seznam.append(i)
@@ -80,7 +81,8 @@ def pridobi_podatke(uid):
     for uporabnik in uporabniki:
         if uporabnik['uid'] == uid:
             return uporabnik
-def podatki(no):
+
+def uporabnik_podatki(no):
     no = int(no)
     uporabniki = odpri_json('podatki/uporabniki.json')
     for uporabnik in uporabniki:

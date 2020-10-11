@@ -4,13 +4,13 @@
 <table>
     <tr>
         <th>ID ponudbe</th>
-        <th>ID zmagovalca</th>
+        <th>Ime zmagovalca</th>
         <th>Cena</th>
     </tr>
-%for id_ponudbe, id_zmagovalca, cena, id_ponudnika in moje:
+%for id_ponudbe, id_zmagovalca, cena, id_ponudnika, ime in moje:
     <tr>
         <td>{{id_ponudbe}}</td>
-        <td>{{id_zmagovalca}}</td>
+        <td>{{ime}}</td>
         <td>{{cena}} €</td>
     </tr>
 %end
@@ -23,10 +23,11 @@
         <th>ID ponudnika </th>
         <th>Cena</th>
     </tr>
-%for id_ponudbe, id_zmagovalca, cena, id_ponudnika in zmage:
+%for id_ponudbe, id_zmagovalca, cena, id_ponudnika, ime in zmage:
     <tr>
         <td>{{id_ponudbe}}</td>
         <td>{{id_zmagovalca}}</td>
+
         <td>{{cena}} €</td>
     </tr>
 %end
