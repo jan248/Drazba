@@ -98,7 +98,6 @@ def vstavi_novega(ime, priimek, uid, geslo):
         naslednja_stevilka = max(seznam) + 1
     except: naslednja_stevilka = 1
 
-    data.append({'id':naslednja_stevilka, 'ime':ime, 'priimek': priimek, 'uid': uid, 'geslo':geslo})
-    zapisi_json('podatki/uporabniki.json', data)
+    dodaj_in_zapisi('podatki/uporabniki.json', {'id':naslednja_stevilka, 'ime':ime, 'priimek': priimek, 'uid': uid, 'geslo':geslo})
     return naslednja_stevilka
 

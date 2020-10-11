@@ -15,8 +15,6 @@ kodiranje = 'skrivnost'
 SERVER_PORT = os.environ.get('BOTTLE_PORT', 8080)
 RELOADER = os.environ.get('BOTTLE_RELOADER', True)
 ROOT = os.environ.get('BOTTLE_ROOT', '/')
-DB_PORT = os.environ.get('POSTGRES_PORT', 5432)
-
 
 
 debug(True)
@@ -160,7 +158,7 @@ def oglas(oznaka):
         if int(i['id']) == int(oznaka):
             podatki = i    
 
-    cas_do_konca = str(dt.datetime.strptime(i['zakljucek'], '%d.%m.%Y %H:%M') - dt.datetime.now())
+    cas_do_konca = str(dt.datetime.strptime(podatki['zakljucek'], '%d.%m.%Y %H:%M') - dt.datetime.now())
     i = cas_do_konca.find('days')
     pretvorba = cas_do_konca[:i] + 'dni' + cas_do_konca[i+4:]
     cas_do_konca = ':'.join(str(pretvorba).split(':')[:2])
@@ -198,7 +196,6 @@ def oglasi_uporabnika():
 
 @post('/uporabnik/oglasi/<oznaka>')
 def odstrani(oznaka):
-    stanje = id_uporabnik()
     data = odpri_json('podatki/oglasi.json')
     oglasi = []
     for i in data:
@@ -218,7 +215,7 @@ def stavi(oznaka):
         if i['id'] == int(oznaka):
             podatki = i    
 
-    cas_do_konca = str(dt.datetime.strptime(i['zakljucek'], '%d.%m.%Y %H:%M') - dt.datetime.now())
+    cas_do_konca = str(dt.datetime.strptime(podatki['zakljucek'], '%d.%m.%Y %H:%M') - dt.datetime.now())
     j = cas_do_konca.find('days')
     pretvorba = cas_do_konca[:j] + 'dni' + cas_do_konca[j+4:]
     cas_do_konca = ':'.join(str(pretvorba).split(':')[:2])
