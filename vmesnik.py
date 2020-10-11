@@ -2,6 +2,12 @@ from bottle import *
 import os
 import json
 import datetime as dt
+from model import *
+
+
+
+
+kodiranje = 'skrivnost'
 
 
 
@@ -12,25 +18,12 @@ ROOT = os.environ.get('BOTTLE_ROOT', '/')
 DB_PORT = os.environ.get('POSTGRES_PORT', 5432)
 
 
-def rtemplate(*largs, **kwargs):
-    """
-    Izpis predloge s podajanjem spremenljivke ROOT z osnovnim URL-jem.
-    """
-    return template(ROOT=ROOT, *largs, **kwargs)
-
-
 
 debug(True)
 
 kodiranje = 'skrivnost'
 
-#funkcija za piškotke
-def id_uporabnik():
-    if request.get_cookie("id", secret = kodiranje):
-        piskotek = request.get_cookie("id", secret = kodiranje)
-        return int(piskotek)
-    else:
-        return 0
+
 
 abs_app_dir_path = os.path.dirname(os.path.realpath(__file__))
 abs_views_path = os.path.join(abs_app_dir_path, 'views')
@@ -38,52 +31,6 @@ TEMPLATE_PATH.insert(0, abs_views_path )
 
 # Mapa za statične vire (slike, css, ...)
 static_dir = "./static"
-
-# Pomožne funkcije za uporabo v kompleknejših daljših funkcijah
-def odpri_json(pot):
-    with open(pot, 'r') as f:
-        return json.load(f)
-
-def zapisi_json(pot, podatki):
-    with open(pot, 'w') as f:
-        json.dump(podatki, f)
-
-def dodaj_in_zapisi(pot, podatek):
-    data = odpri_json(pot)
-    data.append(podatek)
-    zapisi_json(pot, data)
-
-
-def najdi_zmagovalca(id):
-    data = odpri_json('podatki/stave.json')
-    seznam = []
-    for i in data:
-        if int(i['id_ponudbe']) == int(id):
-            helper =  [i['cena'], i['id_ponudnika']]
-            seznam.append(helper)
-    cene = []
-    if seznam == []:
-        return 0,0
-    for i in seznam:
-        cene.append(i[0])
-    cena = max(cene)
-    stevilo = cene.index(cena)
-    zmagovalec = seznam[stevilo][1]
-    return zmagovalec, cena
-    
-
-def preglej_stare():
-    podatki = odpri_json('podatki/oglasi.json')
-    seznam = []
-    for i in podatki:
-        if dt.datetime.strptime(i['zakljucek'], '%d.%m.%Y %H:%M') < dt.datetime.now():
-            zmagovalec, cena = najdi_zmagovalca(i["id_ponudbe"])
-            podatek = {"id_ponudbe": i["id_ponudbe"], "id_zmagovalca": zmagovalec, "cena": cena, "id_ponudnika":i['prodajalec_id']}
-            dodaj_in_zapisi('podatki/stari_oglasi.json', podatek)
-        else:
-            seznam.append(i)
-    zapisi_json('podatki/oglasi.json', seznam)
-
 
 
 
@@ -105,20 +52,6 @@ def zacetna():
     redirect('{0}'.format(ROOT))
 
 
-
-def preveri_uporabnika(ime, geslo):
-    uporabniki = odpri_json('podatki/uporabniki.json')
-    for uporabnik in uporabniki:
-        if uporabnik['uid'] == ime and uporabnik['geslo'] == geslo:
-            return True
-    return False
-
-def pridobi_podatke(uid):
-    uporabniki = odpri_json('podatki/uporabniki.json')
-    for uporabnik in uporabniki:
-        if uporabnik['uid'] == uid:
-            return uporabnik
-
 @get('/prijava/')
 def prijava():
     preglej_stare()
@@ -138,13 +71,7 @@ def prijavljanje():
     else:
         return rtemplate('prijava.html', stanje = 0, napaka = 1)
 
-# no je spremenljivka kot število
-def podatki(no):
-    no = int(no)
-    uporabniki = odpri_json('podatki/uporabniki.json')
-    for uporabnik in uporabniki:
-        if uporabnik['id'] == no:
-            return uporabnik
+
 
 @get('/uporabnik/')
 def uporabnik():
@@ -166,18 +93,6 @@ def registracija():
     return rtemplate('registracija.html', napaka = 0,stanje = stanje, **podatki)
 
 
-def vstavi_novega(ime, priimek, uid, geslo):
-    data = odpri_json('podatki/uporabniki.json')
-    seznam = []
-    for i in data:
-        seznam.append(i['id'])
-    try: 
-        naslednja_stevilka = max(seznam) + 1
-    except: naslednja_stevilka = 1
-
-    data.append({'id':naslednja_stevilka, 'ime':ime, 'priimek': priimek, 'uid': uid, 'geslo':geslo})
-    zapisi_json('podatki/uporabniki.json', data)
-    return naslednja_stevilka
 
 
 @post('/registracija/')
